@@ -29,6 +29,12 @@ export const SidebarItems: FC = () => {
         </ListItemIcon>
         <ListItemText primary="Settings"/>
       </ListItemButton>
+        <ListItemButton onClick={() => window.location.href = "/api/auth/logout"}>
+        <ListItemIcon>
+          <SettingsIcon/>
+        </ListItemIcon>
+        <ListItemText primary="Log out"/>
+      </ListItemButton>
     </>
   )
 }
