@@ -9,65 +9,77 @@ import {javascript} from '@codemirror/lang-javascript'
 import {useRouter} from 'next/navigation'
 
 type CreateSnippetPageProps = {
-  params: {
-    id: string
-  }
+    params: {
+        id: string
+    }
 }
 
 const CreateSnippetPage: FC<CreateSnippetPageProps> = ({params}) => {
-  const id: string = params.id
+    const id: string = params.id
 
-  const router = useRouter()
+    const router = useRouter()
 
-  const {snippetOperations} = useOperations()
-  const {data: snippet, isFetching} = useQuery(['snippets', 'full', id], () => snippetOperations.getSnippetById(id))
+    const {snippetOperations} = useOperations()
+    const {data: snippet, isFetching} = useQuery(['snippets', 'full', id], () => snippetOperations.getSnippetById(id))
 
-  const handleGoToEdit = useCallback(() => {
-    router.push(`/snippets/edit/${id}`)
-  }, [id, router])
+    const handleGoToEdit = useCallback(() => {
+        router.push(`/snippets/edit/${id}`)
+    }, [id, router])
 
-  const handleGoToSnippets = useCallback(() => {
-    router.push(`/snippets`)
-  }, [id, router])
+    const handleGoToSnippets = useCallback(() => {
+        router.push(`/snippets`)
+    }, [id, router])
 
-  return (
-    <Paper variant="outlined" sx={{my: {xs: 3, md: 6}, p: {xs: 2, md: 3}}}>
-      <Typography component="h1" variant="h4" align="center">
-        {snippet?.name}
-      </Typography>
-      <Grid container justifyContent="center">
-        {isFetching ? (
-          <Grid item xs={1}>
-            <CircularProgress/>
-          </Grid>
-        ) : snippet !== undefined && (
-          <>
-            <Grid item xs={12}>
-              <CodeMirror
-                value={snippet.content}
-                height="500px"
-                width="100%"
-                extensions={[javascript({typescript: true, jsx: false})]}
-                readOnly={true}
-              />
+    const handleDownload = useCallback((string: string) => {
+        const blob = new Blob([string], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.download = "snippet.txt";
+        link.href = url;
+        link.click();
+    }, [id, router])
+
+    return (
+        <Paper variant="outlined" sx={{my: {xs: 3, md: 6}, p: {xs: 2, md: 3}}}>
+            <Typography component="h1" variant="h4" align="center">
+                {snippet?.name}
+            </Typography>
+            <Grid container justifyContent="center">
+                {isFetching ? (
+                    <Grid item xs={1}>
+                        <CircularProgress/>
+                    </Grid>
+                ) : snippet !== undefined && (
+                    <>
+                        <Grid item xs={12}>
+                            <CodeMirror
+                                value={snippet.content}
+                                height="500px"
+                                width="100%"
+                                extensions={[javascript({typescript: true, jsx: false})]}
+                                readOnly={true}
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
+                                <Button variant="contained" sx={{mt: 3, ml: 1}} onClick={() => handleDownload(snippet.content)}>
+                                    Download
+                                </Button>
+                                <Button variant="contained" sx={{mt: 3, ml: 1}} onClick={handleGoToEdit}>
+                                    Go to Edit
+                                </Button>
+                                <Button sx={{mt: 3, ml: 1}} onClick={handleGoToSnippets}>
+                                    Go to Snippets
+                                </Button>
+                            </Box>
+                        </Grid>
+                    </>
+                )}
+
             </Grid>
-            <Grid item xs={12}>
-              <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
-                <Button variant="contained" sx={{mt: 3, ml: 1}} onClick={handleGoToEdit}>
-                  Go to Edit
-                </Button>
-                <Button sx={{mt: 3, ml: 1}} onClick={handleGoToSnippets}>
-                  Go to Snippets
-                </Button>
-              </Box>
-            </Grid>
-          </>
-        )}
 
-      </Grid>
-
-    </Paper>
-  )
+        </Paper>
+    )
 }
 
 export default CreateSnippetPage
