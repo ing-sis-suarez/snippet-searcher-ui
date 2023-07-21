@@ -13,8 +13,10 @@ export class ActualSnippetOperations implements SnippetOperations {
         'Authorization': `Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Img1V2xFaTZjd2pxR2hYeGV3M1RwUCJ9.eyJpc3MiOiJodHRwczovL2Rldi03cW5vajZnMGJ2dzNmMnFzLnVzLmF1dGgwLmNvbS8iLCJzdWIiOiJhdXRoMHw2NGI5MTA2MDI2Y2ZjMjNiOTczOWM0YmMiLCJhdWQiOiJodHRwczovL2luZy1zaXMtb3JnLXNuaXBwZXRzIiwiaWF0IjoxNjg5ODc2OTk4LCJleHAiOjE2ODk5NjMzOTgsImF6cCI6IlBhbTVaOEtKdnJBMWs5YmN6TnpnU1F1V3V2RTFxbXFlIiwiZ3R5IjoicGFzc3dvcmQifQ.EzCXFvLCO1k8Vv4awtYAonarzTGdj-SYCej89OyIp5krAbXrd2wY2cbJFk7ygDNiQQQej7zeMCyfUz8I2iiWiyZAz2-ks4ZHorS3ciAv0z4JRkHmbgTSNmlBNyGppAz7PFaHm8v8yWp31fniKTq4UAp2kv6ICX9NtM-81TFH_erGe4PV-5Z0lSg335IrB-oVVQikogDFo-4lvx7eTFpwHRJAVhfmmQtUmv65A7rDCfhfCj05nZ3gRcvLV2zulXMkuDVgr528ZHDXHldGGKD4RqrPI78mnIUEvL1vAIxXUSB1B9DG8fCg5_LFKcDdCExVLp9IMQ1cFVuvSwKBZJm1ww`,
         'Content-Type': 'application/json'
     })
+
+    serverurl = () => 'https://ing-sis-org.casacam.net/snippet-manager'
     async createSnippet(createSnippet: CreateSnippet): Promise<SnippetDescriptor> {
-        const response = await fetch('http://localhost:8081/snippet', {
+        const response = await fetch(this.serverurl() + '/snippet', {
             method: 'POST',
             headers: this.headers(),
             body: JSON.stringify({
@@ -33,7 +35,7 @@ export class ActualSnippetOperations implements SnippetOperations {
     }
 
     async getSnippetById(id: string): Promise<Snippet | undefined> {
-        const data = await fetch('http://localhost:8081/snippet/' + id, {
+        const data = await fetch(this.serverurl() + '/snippet/' + id, {
             method: 'GET',
             headers: this.headers()
         }).then(response => {
@@ -50,24 +52,25 @@ export class ActualSnippetOperations implements SnippetOperations {
 
     async listSnippetDescriptors(): Promise<SnippetDescriptor[]> {
         console.log("update list")
-        const data = await fetch('http://localhost:8081/all-snippets', {
+        const data = await fetch(this.serverurl() + '/all-snippets', {
             method: 'GET',
             headers: this.headers()
         }).then(response => {
             return response.json()
         })
         return data.map((snippet: any) => {
+            console.log(snippet)
             return {
                 id: snippet.id,
                 name: snippet.title,
-                type: snippet.language,
+                type: snippet.type,
                 compliance: snippet.compliance
             }
         })
     }
 
     async updateSnippetById(id: string, updateSnippet: UpdateSnippet): Promise<SnippetDescriptor> {
-        const data = await fetch('http://localhost:8081/snippet/' + id, {
+        const data = await fetch(this.serverurl() + '/snippet/' + id, {
             method: 'PUT',
             headers: this.headers(),
             body: JSON.stringify({
